@@ -8,7 +8,6 @@ import { WebClient } from '@slack/web-api';
 
 const { App } = pkg;
 
-// Initialize your Bolt app
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -28,6 +27,7 @@ async function findDetails(query) {
       }
     }
   } catch (error) {
+    console.error(`Error: ${error.message}`);
     return `Error: ${error.message}`;
   }
   return 'Details not found';
@@ -46,7 +46,6 @@ expressApp.post('/slack/events', async (req, res) => {
   const slackEvent = req.body;
   console.log('Received Slack Event:', JSON.stringify(slackEvent, null, 2));
 
-  // URL Verification Challenge
   if (slackEvent.type === 'url_verification') {
     console.log('Responding to URL verification challenge:', slackEvent.challenge);
     res.status(200).send(slackEvent.challenge);
