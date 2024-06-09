@@ -52,8 +52,11 @@ expressApp.post('/slack/events', async (req, res) => {
   }
 
   try {
-    await app.processEvent(slackEvent);
-    res.status(200).send();
+    // Ensure the event is processed correctly
+    await app.processEvent({
+      body: slackEvent,
+      ack: () => res.status(200).send()
+    });
   } catch (error) {
     console.error('Error processing event:', error);
     res.status(500).send('Internal Server Error');
