@@ -3,8 +3,10 @@ dotenv.config();
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import { App } from '@slack/bolt';
+import pkg from '@slack/bolt';
 import { WebClient } from '@slack/web-api';
+
+const { App } = pkg;
 
 // Initialize your Bolt app
 const app = new App({
@@ -22,7 +24,7 @@ async function findDetails(query) {
 
     for (const message of response.messages) {
       if (message.text.includes(query)) {
-        return message.text; // Customize this to extract specific details
+        return message.text;
       }
     }
   } catch (error) {
@@ -31,19 +33,14 @@ async function findDetails(query) {
   return 'Details not found';
 }
 
-app.message(/(\b\d{19}\b|\bORDER\d{6}\b)/, async ({ message, say }) => {
-  const query = message.text;
+app.message(/(\bE\d{7}\b|\b\d{19}\b)/, async ({ message, say }) => {
+  const query = message.text.match(/(\bE\d{7}\b|\b\d{19}\b)/)[0];
   const details = await findDetails(query);
   await say(`Details for ${query}: ${details}`);
 });
 
 const expressApp = express();
 expressApp.use(bodyParser.json());
-
-// Add a route for the root URL
-expressApp.get('/', (req, res) => {
-  res.send('Hello, world! The server is up and running.');
-});
 
 expressApp.post('/slack/events', async (req, res) => {
   const slackEvent = req.body;
@@ -65,7 +62,12 @@ expressApp.post('/slack/events', async (req, res) => {
     send: (data) => res.send(data),
   };
 
-  await app.processEvent(slackRequest, slackResponse);
+  try {
+    await app.processEvent(slackRequest, slackResponse);
+  } catch (error) {
+    console.error('Error processing event:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 const PORT = process.env.PORT || 3000;
