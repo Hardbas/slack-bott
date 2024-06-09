@@ -1,13 +1,12 @@
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 dotenv.config();
 
-import express from 'express';
-import bodyParser from 'body-parser';
-import pkg from '@slack/bolt';
-import { WebClient } from '@slack/web-api';
+const express = require('express');
+const bodyParser = require('body-parser');
+const { App } = require('@slack/bolt');
+const { WebClient } = require('@slack/web-api');
 
-const { App } = pkg;
-
+// Initialize your Bolt app
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -23,7 +22,7 @@ async function findDetails(query) {
 
     for (const message of response.messages) {
       if (message.text.includes(query)) {
-        return message.text;
+        return message.text; // Customize this to extract specific details
       }
     }
   } catch (error) {
@@ -46,6 +45,7 @@ expressApp.post('/slack/events', async (req, res) => {
   const slackEvent = req.body;
   console.log('Received Slack Event:', JSON.stringify(slackEvent, null, 2));
 
+  // URL Verification Challenge
   if (slackEvent.type === 'url_verification') {
     console.log('Responding to URL verification challenge:', slackEvent.challenge);
     res.status(200).send(slackEvent.challenge);
