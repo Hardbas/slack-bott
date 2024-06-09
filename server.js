@@ -1,8 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const { App } = require('@slack/bolt');
-const { WebClient } = require('@slack/web-api');
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
+import bodyParser from 'body-parser';
+import pkg from '@slack/bolt';
+import { WebClient } from '@slack/web-api';
+
+const { App } = pkg;
 
 // Initialize your Bolt app
 const app = new App({
@@ -20,7 +24,7 @@ async function findDetails(query) {
 
     for (const message of response.messages) {
       if (message.text.includes(query)) {
-        return message.text;
+        return message.text; // Customize this to extract specific details
       }
     }
   } catch (error) {
@@ -38,10 +42,16 @@ app.message(/(\b\d{19}\b|\bORDER\d{6}\b)/, async ({ message, say }) => {
 const expressApp = express();
 expressApp.use(bodyParser.json());
 
+// Add a route for the root URL
+expressApp.get('/', (req, res) => {
+  res.send('Hello, world! The server is up and running.');
+});
+
 expressApp.post('/slack/events', async (req, res) => {
   const slackEvent = req.body;
   console.log('Received Slack Event:', JSON.stringify(slackEvent, null, 2));
 
+  // URL Verification Challenge
   if (slackEvent.type === 'url_verification') {
     console.log('Responding to URL verification challenge:', slackEvent.challenge);
     res.status(200).send(slackEvent.challenge);
