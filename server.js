@@ -52,7 +52,7 @@ expressApp.post('/slack/events', async (req, res) => {
   }
 
   try {
-    await app.processEvent(req, res);
+    await app.processEvent(slackEvent);
     res.status(200).send();
   } catch (error) {
     console.error('Error processing event:', error);
