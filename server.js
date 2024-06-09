@@ -3,10 +3,8 @@ dotenv.config();
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import pkg from '@slack/bolt';
+import { App } from '@slack/bolt';
 import { WebClient } from '@slack/web-api';
-
-const { App } = pkg;
 
 // Initialize your Bolt app
 const app = new App({
