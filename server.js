@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 const { App } = require('@slack/bolt');
 const { WebClient } = require('@slack/web-api');
 
-// Initialize your Bolt app
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -22,7 +21,7 @@ async function findDetails(query) {
 
     for (const message of response.messages) {
       if (message.text.includes(query)) {
-        return message.text; // Customize this to extract specific details
+        return message.text;
       }
     }
   } catch (error) {
@@ -45,7 +44,6 @@ expressApp.post('/slack/events', async (req, res) => {
   const slackEvent = req.body;
   console.log('Received Slack Event:', JSON.stringify(slackEvent, null, 2));
 
-  // URL Verification Challenge
   if (slackEvent.type === 'url_verification') {
     console.log('Responding to URL verification challenge:', slackEvent.challenge);
     res.status(200).send(slackEvent.challenge);
@@ -67,6 +65,10 @@ expressApp.post('/slack/events', async (req, res) => {
     console.error('Error processing event:', error);
     res.status(500).send('Internal Server Error');
   }
+});
+
+expressApp.get('/', (req, res) => {
+  res.send('Slack Bot is running');
 });
 
 const PORT = process.env.PORT || 3000;
