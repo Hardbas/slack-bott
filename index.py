@@ -1,11 +1,11 @@
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
+from flask import Flask, request
 import os
 import re
-from flask import Flask, request
 
 # Initialize the Slack app with your bot token
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+bolt_app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
 # Define the channel ID of your private channel
 CHANNEL_ID = os.environ.get("SLACK_CHANNEL_ID")
@@ -17,10 +17,10 @@ USER_TOKEN = os.environ.get("SLACK_USER_TOKEN")
 flask_app = Flask(__name__)
 
 # Create a SlackRequestHandler
-handler = SlackRequestHandler(app)
+handler = SlackRequestHandler(bolt_app)
 
 # Listen for DMs containing order numbers or ICCIDs
-@app.message(re.compile(r"(#\w{8})|(898\d{16,})"))
+@bolt_app.message(re.compile(r"(#\w{8})|(898\d{16,})"))
 def handle_message(client, event, say):
     query = event['text'].strip()
     print(f"Received DM with query: {query}")  # Debug statement
@@ -49,5 +49,6 @@ def handle_message(client, event, say):
 def slack_events():
     return handler.handle(request)
 
-# This line is necessary for Vercel to recognize the app as a WSGI app
-app = flask_app
+# Ensure the Flask app runs in the local environment
+if __name__ == "__main__":
+    flask_app.run(debug=True)
