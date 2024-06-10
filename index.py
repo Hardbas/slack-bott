@@ -4,7 +4,7 @@ import os
 import re
 from flask import Flask, request
 
-# Initialize the Slack app with your bot token and signing secret
+# Initialize the Slack app with your bot token
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
 # Define the channel ID of your private channel
@@ -49,6 +49,5 @@ def handle_message(client, event, say):
 def slack_events():
     return handler.handle(request)
 
-# Start the Flask app
-if __name__ == "__main__":
-    flask_app.run(debug=True)
+# This line is necessary for Vercel to recognize the app as a WSGI app
+app = flask_app
