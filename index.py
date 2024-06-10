@@ -1,5 +1,5 @@
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
+from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 import os
 import re
 
@@ -37,7 +37,9 @@ def handle_message(client, event, say):
     except Exception as e:
         print(f"Error fetching conversation history: {e}")
 
-# Start the Slack app
-if __name__ == "__main__":
-    handler = SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN"))
-    handler.start()
+# Create an instance of SlackRequestHandler
+handler = SlackRequestHandler(app)
+
+# Lambda handler function
+def lambda_handler(event, context):
+    return handler.handle(event, context)
