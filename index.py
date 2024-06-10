@@ -42,13 +42,4 @@ def handle_message(client, event, say):
         say("No matching order number or ICCID found.")
         print("No matching order number or ICCID found.")  # Debug statement
     except Exception as e:
-        print(f"Error fetching conversation history: {e}")
-
-# Create a route to handle Slack events
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
-
-# Start the Flask app
-if __name__ == "__main__":
-    flask_app.run(debug=True)
+        print(f"E
