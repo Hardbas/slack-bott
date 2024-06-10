@@ -1,8 +1,8 @@
 from slack_bolt import App
 from slack_bolt.adapter.flask import SlackRequestHandler
-from flask import Flask, request
 import os
 import re
+from flask import Flask, request
 
 # Initialize the Slack app with your bot token
 bolt_app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
@@ -49,6 +49,5 @@ def handle_message(client, event, say):
 def slack_events():
     return handler.handle(request)
 
-# Ensure the Flask app runs in the local environment
-if __name__ == "__main__":
-    flask_app.run(debug=True)
+# Expose the Flask app for Vercel
+app = flask_app
