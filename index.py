@@ -1,8 +1,8 @@
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
+from slack_bolt.adapter.flask import SlackRequestHandler
 import os
 import re
-from flask import Flask, request, jsonify
+from flask import Flask, request
 
 # Initialize the Slack app with your bot token and signing secret
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
