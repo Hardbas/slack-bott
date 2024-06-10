@@ -53,5 +53,9 @@ def handle_message(client, event, say):
 def slack_events():
     return handler.handle(request)
 
+# Ensure the Flask app runs in the local environment
+if __name__ == "__main__":
+    flask_app.run(debug=True)
+
 # Expose the Flask app for Vercel
 app = flask_app
