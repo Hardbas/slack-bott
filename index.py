@@ -1,7 +1,8 @@
 from slack_bolt import App
-from slack_bolt.adapter.aws_lambda import SlackRequestHandler
+from slack_bolt.adapter.socket_mode import SocketModeHandler
 import os
 import re
+from flask import Flask, request, jsonify
 
 # Initialize the Slack app with your bot token and signing secret
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
@@ -11,6 +12,12 @@ CHANNEL_ID = os.environ.get("SLACK_CHANNEL_ID")
 
 # Your updated user token with required scopes
 USER_TOKEN = os.environ.get("SLACK_USER_TOKEN")
+
+# Initialize Flask
+flask_app = Flask(__name__)
+
+# Create a SlackRequestHandler
+handler = SlackRequestHandler(app)
 
 # Listen for DMs containing order numbers or ICCIDs
 @app.message(re.compile(r"(#\w{8})|(898\d{16,})"))
@@ -37,9 +44,11 @@ def handle_message(client, event, say):
     except Exception as e:
         print(f"Error fetching conversation history: {e}")
 
-# Create an instance of SlackRequestHandler
-handler = SlackRequestHandler(app)
+# Create a route to handle Slack events
+@flask_app.route("/slack/events", methods=["POST"])
+def slack_events():
+    return handler.handle(request)
 
-# Lambda handler function
-def lambda_handler(event, context):
-    return handler.handle(event, context)
+# Start the Flask app
+if __name__ == "__main__":
+    flask_app.run(debug=True)
